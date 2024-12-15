@@ -11,18 +11,21 @@ const HotelCard = ({ hotel }) => {
     },[hotel])
 
     const GetPlacePhoto = async () => {
-        const data = {
-            textQuery:hotel?.name
+        try {
+            const data = { textQuery: hotel?.name };
+            const result = await GetPlaceDetails(data);
+            const photoData = result?.data?.places?.[0]?.photos?.[1];
+            if (photoData?.name) {
+                const photourl = PHOTO_REF_URL.replace('{NAME}', photoData.name);
+                setPhotoUrl(photourl);
+            } else {
+                console.warn("Photo data not found for:", hotel?.name);
+            }
+        } catch (error) {
+            console.error("Error fetching place photo:", error);
         }
-        // eslint-disable-next-line no-unused-vars
-        const result = await GetPlaceDetails(data).then(res => {
-            // console.log(res.data.places[0].photos[3].name);
-
-            const photourl= PHOTO_REF_URL.replace('{NAME}',res.data.places[0].photos[1].name)
-            setPhotoUrl(photourl);
-            
-        })
-    }
+    };
+    
     return (
         <Link to={"https://www.google.com/maps/search/?api=1&query=" + hotel?.name + "," + hotel?.address} target="_blank">
             <div className="hover:scale-105 transition-all cursor-pointer shadow-md shadow-slate-400 rounded-md">
